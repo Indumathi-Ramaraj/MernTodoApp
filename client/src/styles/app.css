@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.validation-success {
+  color: #66bb6a;
+  border-color: #66bb6a;
+}
+
+.validation-error {
+  color: #dc2626;
+  border-color: #dc2626;
+}
