@@ -16,7 +16,7 @@ const todoRoutes = require("./routes/todoList");
 const app = express();
 
 //middlewares
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // swagger
 app.use(morgan("dev"));
 app.use(bodyParser.json());
@@ -25,7 +25,10 @@ app.use(cookieParser());
 //cors
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: [
+      "http://localhost:3000",
+      "https://mern-todo-csm976bnu-indumathiramarajs-projects.vercel.app/",
+    ],
     credentials: true,
   })
 );
