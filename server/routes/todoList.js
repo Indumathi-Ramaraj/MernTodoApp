@@ -6,7 +6,7 @@ const {
   updateTodoStatus,
   deleteTodoItem,
 } = require("../controllers/todoController");
-const { requireAuth } = require("../middlewares/authMiddleWare");
+const { requireAuth } = require("../middlewares/authMiddleware");
 const { todoValidation } = require("../utlis/validators");
 
 const router = express.Router();
