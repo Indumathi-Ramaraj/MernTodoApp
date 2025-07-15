@@ -19,7 +19,7 @@ const options = {
 
     servers: [
       {
-        url: "http://localhost:8000/api",
+        url: "https://mern-todo-backend-88mz.onrender.com/api",
         description: "Local dev server",
       },
     ],
@@ -33,7 +33,7 @@ const options = {
           type: "oauth2",
           flows: {
             password: {
-              tokenUrl: "http://localhost:8000/api/login",
+              tokenUrl: "https://mern-todo-backend-88mz.onrender.com/api/login",
               description: "Use your email as username",
               scopes: {},
             },
