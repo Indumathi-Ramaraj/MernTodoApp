@@ -24,15 +24,17 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error?.response?.status == 401) {
-      Cookies.remove("token");
-      if (!window.location.pathname.includes("/login"))
-        window.location.replace("/login");
-    }
-    if (error?.response?.status == 417) {
-      if (!window.location.pathname.includes("/session-expired"))
-        window.location.replace("/session-expired");
-      return new Promise(() => {});
+    if (typeof window !== "undefined") {
+      if (error?.response?.status == 401) {
+        Cookies.remove("token");
+        if (!window.location.pathname.includes("/login"))
+          window.location.replace("/login");
+      }
+      if (error?.response?.status == 417) {
+        if (!window.location.pathname.includes("/session-expired"))
+          window.location.replace("/session-expired");
+        return new Promise(() => {});
+      }
     }
     return Promise.reject(error);
   }

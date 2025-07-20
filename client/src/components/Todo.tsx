@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { deleteTodo, getTodo, postTodo, updateTodo } from "../action/todo";
 import Cookies from "js-cookie";
 import type { Todo } from "../type/todo";
+import { Link } from "react-router-dom";
 
 const TodoApp = () => {
   const [task, setTask] = useState("");
@@ -76,11 +77,22 @@ const TodoApp = () => {
       );
   };
 
-  console.log("todos..", todos);
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center">📝 Todo App</h1>
+        <div className="flex justify-between items-center w-full mb-4">
+          <h1 className="text-2xl font-bold text-center flex-1">📝 Todo App</h1>
+          <Link
+            onClick={() => {
+              Cookies.remove("token");
+              Cookies.remove("user");
+            }}
+            to="/login"
+            className="bg-gray-400 text-white px-2 py-1 rounded-xl hover:bg-blue-600 transition"
+          >
+            Sign out
+          </Link>
+        </div>
 
         <div className="flex gap-2 mb-4">
           <input
@@ -88,7 +100,7 @@ const TodoApp = () => {
             placeholder="Enter a task..."
             className="flex-1 p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={task}
-            onChange={(e) => setTask(e.target.value)}
+            onChange={(e: any) => setTask(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addTask()}
           />
           <button

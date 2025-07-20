@@ -1,7 +1,6 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
-const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -19,7 +18,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // swagger
 app.use(morgan("dev"));
-app.use(bodyParser.json());
 app.use(cookieParser());
 
 //cors
@@ -27,15 +25,13 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://mern-todo-csm976bnu-indumathiramarajs-projects.vercel.app/",
+      "http://localhost:8000",
+      "https://mern-todo-backend-88mz.onrender.com",
     ],
     credentials: true,
   })
 );
 
-if (process.env.NODE_ENV === "development") {
-  app.use(cors({ origin: process.env.CLIENT_URL }));
-}
 
 //db
 mongoose

@@ -65,7 +65,8 @@ Server will run on
 The API is documented using Swagger (OpenAPI 3.0).
 You can test and explore all available routes using the Swagger UI:
 
-Swagger UI: [http://localhost:8000/api-docs]
+Swagger UI local     : [http://localhost:8000/api-docs]
+Swagger UI server    : [https://mern-todo-backend-88mz.onrender.com/api-docs]
 
 Use the Authorize button in the top-right corner of Swagger UI to add the Bearer token after login.
 
