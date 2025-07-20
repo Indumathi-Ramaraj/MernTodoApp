@@ -27,6 +27,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:8000",
       "https://mern-todo-backend-88mz.onrender.com",
+      "https://mern-todo-app-tan.vercel.app",
     ],
     credentials: true,
   })

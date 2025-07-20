@@ -70,7 +70,6 @@ export default function Signup() {
       specialChar: /(?=.*[$^-_+=`/.><|:;#()@!%*?&])/,
       minLength: /^.{6,}$/, // Minimum 6 characters
     };
-
     // Map through validation constants and check if each condition is met
     const passwordValidationConstantsCloned = passwordValidationConstants.map(
       (state: any) => {
@@ -82,8 +81,6 @@ export default function Signup() {
     // Update state with new validation results
     setPasswordValidationConstants([...passwordValidationConstantsCloned]);
   };
-
-  console.log("password....", passwordValidationConstants);
 
   const handleSubmit = () => {
     signup(authValues.name, authValues.email, password.password.value)
