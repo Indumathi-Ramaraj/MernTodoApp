@@ -13,19 +13,16 @@ const TodoApp = () => {
   const userString = Cookies.get("user");
   const user = userString ? JSON.parse(userString) : null;
 
-  useEffect(() => {
-    if (user && user?.id) {
-      getTodo(user?.id)
-        .then((res) => {
-          const tasks = Array.isArray(res[0]?.toDoList) ? res[0].toDoList : [];
-
-          setTodos(tasks);
-        })
-        .catch(() => {
-          toast.error("Error in fetching the todo list");
-        });
-    }
-  }, [user?.id]);
+  const getTodos = (id: string) => {
+    getTodo(id)
+      .then((res) => {
+        const tasks = Array.isArray(res[0]?.toDoList) ? res[0].toDoList : [];
+        setTodos(tasks);
+      })
+      .catch(() => {
+        toast.error("Error in fetching the todo list");
+      });
+  };
 
   const addTask = () => {
     if (task.trim()) {
@@ -37,7 +34,7 @@ const TodoApp = () => {
       ])
         .then((res) => {
           toast.success("Successfully added the todo");
-          setTodos(res.todo.toDoList);
+          setTodos(res.todo);
         })
         .catch(() => toast.error("Error in adding the todo list"));
       setTask("");
@@ -45,7 +42,7 @@ const TodoApp = () => {
   };
 
   const toggleDone = (id: number, title: string, done: boolean) => {
-    updateTodo(user?.id, { id, done })
+    updateTodo(user?.id, whatsapp, user.phoneNumber, { id, done })
       .then(() => {
         toast.success(
           `${
@@ -66,7 +63,7 @@ const TodoApp = () => {
   };
 
   const toggleDelete = (id: number, title: string) => {
-    deleteTodo(user?.id, id)
+    deleteTodo(user?.id, whatsapp, user.phoneNumber, id)
       .then(() => {
         toast.success(`Successfully deleted the todo with title ${title}`);
         setTodos(todos.filter((todo) => todo._id !== id));
@@ -77,6 +74,12 @@ const TodoApp = () => {
         )
       );
   };
+
+  useEffect(() => {
+    if (user && user?.id) {
+      getTodos(user?.id);
+    }
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">

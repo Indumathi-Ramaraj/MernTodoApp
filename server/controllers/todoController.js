@@ -54,14 +54,61 @@ exports.createTodo = async (req, res) => {
       console.error("❌ WhatsApp send failed", error.message);
     }
   }
-
-  const newTodo = await Todo.create({ userId, toDoList });
-  res.status(201).json({ message: "Todo created", todo: newTodo });
+  const finalTodo = await Todo.findOne({ userId });
+  res.status(201).json({
+    message: "Todo(s) created",
+    todo: finalTodo.toDoList,
+  });
 };
 
 exports.updateTodoStatus = async (req, res) => {
   const userId = req.user._id;
-  const { id, done } = req.body;
+  const { id, done, phoneNumber, whatsappOptIn } = req.body;
+
+  if (!id || typeof done !== "boolean") {
+    return res.status(400).json({ error: "Todo ID and done status required" });
+  }
+
+  try {
+    const updated = await Todo.findOneAndUpdate(
+      { userId, "toDoList._id": new mongoose.Types.ObjectId(id) },
+      { $set: { "toDoList.$.done": done } },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    // ✅ WhatsApp Notification
+    if (whatsappOptIn && phoneNumber) {
+      try {
+        const taskText = toDoList
+          .map((task, idx) => `${idx + 1}. ${task.title}`)
+          .join("\n");
+
+        const messageBody = `📝 You have updated ${taskText} to ${done}`;
+
+        await client.messages.create({
+          body: messageBody,
+          from: "whatsapp:+14155238886", // Twilio sandbox sender
+          to: `whatsapp:${phoneNumber}`, // e.g. whatsapp:+91xxxxxxxxxx
+        });
+
+        console.log("WhatsApp notification sent ✅");
+      } catch (error) {
+        console.error("❌ WhatsApp send failed", error.message);
+      }
+    }
+    res.json({ message: "Todo updated", todo: updated });
+  } catch (err) {
+    console.error("Error updating todo:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.updateTodoStatus = async (req, res) => {
+  const userId = req.user._id;
+  const { id, done, phoneNumber, whatsappOptIn } = req.body;
 
   if (!id || typeof done !== "boolean") {
     return res.status(400).json({ error: "Todo ID and done status required" });
@@ -78,6 +125,29 @@ exports.updateTodoStatus = async (req, res) => {
       return res.status(404).json({ error: "Todo not found" });
     }
 
+    // ✅ Find the specific task updated
+    const updatedTask = updated.toDoList.find(
+      (task) => task._id.toString() === id
+    );
+
+    // ✅ WhatsApp Notification
+    if (whatsappOptIn && phoneNumber && updatedTask) {
+      try {
+        const messageBody = `✅ You have updated task *"${
+          updatedTask.title
+        }"* to *${done ? "completed" : "incomplete"}*.`;
+
+        await client.messages.create({
+          body: messageBody,
+          from: "whatsapp:+14155238886", // Twilio sandbox sender
+          to: `whatsapp:${phoneNumber}`,
+        });
+
+        console.log("WhatsApp notification sent ✅");
+      } catch (error) {
+        console.error("❌ WhatsApp send failed", error.message);
+      }
+    }
     res.json({ message: "Todo updated", todo: updated });
   } catch (err) {
     console.error("Error updating todo:", err);
@@ -87,22 +157,43 @@ exports.updateTodoStatus = async (req, res) => {
 
 exports.deleteTodoItem = async (req, res) => {
   const userId = req.user._id;
-  const { id } = req.body;
+  const { id, phoneNumber, whatsappOptIn } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: "Todo ID is required" });
   }
 
   try {
+    const todoDoc = await Todo.findOne({ userId });
+    const taskToDelete = todoDoc?.toDoList.find(
+      (task) => task._id.toString() === id
+    );
+
+    if (!taskToDelete) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+    
     const updated = await Todo.findOneAndUpdate(
       { userId },
       { $pull: { toDoList: { _id: new mongoose.Types.ObjectId(id) } } },
       { new: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ error: "Todo not found" });
-    }
+    // ✅ WhatsApp Notification
+   if (whatsappOptIn && phoneNumber) {
+     try {
+       const messageBody = `🗑️ You have deleted the task *"${taskToDelete.title}"* from your TODO list.`;
+       await client.messages.create({
+         body: messageBody,
+         from: "whatsapp:+14155238886", // Twilio sandbox sender
+         to: `whatsapp:${phoneNumber}`,
+       });
+
+       console.log("WhatsApp notification sent ✅");
+     } catch (error) {
+       console.error("❌ WhatsApp send failed", error.message);
+     }
+   }
 
     res.json({ message: "Todo deleted", todo: updated });
   } catch (err) {
