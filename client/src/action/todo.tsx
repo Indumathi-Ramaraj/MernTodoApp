@@ -6,8 +6,17 @@ export const getTodo = async (userId: string) => {
   return res.data;
 };
 
-export const postTodo = async (userId: string, toDoList: object) => {
-  let res = await axiosInstance.post(Endpoints.TODO(userId), { toDoList });
+export const postTodo = async (
+  userId: string,
+  whatsapp: boolean,
+  phoneNumber: number,
+  toDoList: object
+) => {
+  let res = await axiosInstance.post(Endpoints.TODO(userId), {
+    whatsappOptIn: whatsapp,
+    phoneNumber: phoneNumber,
+    toDoList,
+  });
   return res.data;
 };
 

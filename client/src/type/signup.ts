@@ -27,3 +27,10 @@ export type ShowPasswordType = {
 };
 
 export type PasswordType = "password" | "confirmPassword";
+
+export type authValues = {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  countryCode: string;
+};

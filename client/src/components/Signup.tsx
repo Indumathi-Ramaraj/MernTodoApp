@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { signup } from "../action/signup";
 import type {
+  authValues,
   PasswordFields,
   PasswordType,
   PasswordValidationType,
@@ -40,7 +41,12 @@ const passwordValidationConstantList: Array<PasswordValidationType> = [
 ];
 
 export default function Signup() {
-  const [authValues, setAuthValues] = useState({ name: "", email: "" });
+  const [authValues, setAuthValues] = useState<authValues>({
+    name: "",
+    email: "",
+    countryCode: "+91",
+    phoneNumber: "",
+  });
   const [validation, setValidation] = useState(false);
   const [password, setPassword] = useState<PasswordFields>({
     password: { value: "", isError: false, helperText: "" },
@@ -83,7 +89,13 @@ export default function Signup() {
   };
 
   const handleSubmit = () => {
-    signup(authValues.name, authValues.email, password.password.value)
+    signup(
+      authValues.name,
+      authValues.email,
+      authValues.countryCode,
+      authValues.phoneNumber,
+      password.password.value
+    )
       .then((res) => {
         if (res.message === "success") {
           toast.success("Successfully Registered");
@@ -93,8 +105,8 @@ export default function Signup() {
       .catch((err) => {
         toast.error(
           `${
-            err.response.data.errors
-              ? err.response.data.errors[0].msg
+            err.response.data.message
+              ? err.response.data.message
               : "Error in registration"
           }`
         );
@@ -113,6 +125,8 @@ export default function Signup() {
     });
   };
 
+
+console.log("authValues.phoneNumber.length..",authValues.phoneNumber.length);
   const handleChangePassword = (type: PasswordType, value: string) => {
     let passwordState: PasswordFields;
     if (type === "password") {
@@ -189,11 +203,59 @@ export default function Signup() {
               </p>
             )}
           </div>
+          <div>
+            <label htmlFor="phoneNumber" className="block font-medium mb-1">
+              Phone Number
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="+91"
+                value={authValues.countryCode}
+                onChange={(e) => authHandler("countryCode", e.target.value)}
+                className="w-24 px-3 py-2 border rounded text-center"
+              />
+
+              <input
+                type="text"
+                placeholder="Phone number"
+                value={authValues.phoneNumber}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only update if it's digits and ≤ 10 chars
+                  // if (/^\d{0,10}$/.test(value)) {
+                  //   authHandler("phoneNumber", value);
+                  // }
+                  authHandler("phoneNumber", value);
+                }}
+                className="flex-1 px-3 py-2 border rounded"
+              />
+            </div>
+            <div className="grid grid-cols-6">
+              {validation && !authValues.countryCode && (
+                <p className="col-span-2 text-red-600 error self-start text-xs mt-1">
+                  Country Code is required
+                </p>
+              )}
+              {validation && !authValues.phoneNumber && (
+                <p className="col-start-3 col-span-4 text-red-600 error self-start text-xs mt-1">
+                  Phone number is required
+                </p>
+              )}
+              {validation &&
+                authValues.phoneNumber &&
+                authValues.phoneNumber.length > 10 && (
+                  <p className="col-start-3 col-span-4 text-red-600 error self-start text-xs mt-1">
+                    Phone number cannot be more than 10 digits.
+                  </p>
+                )}
+            </div>
+          </div>
           <div
             className={`relative text-gray-600 rounded-lg outline-none bg-white focus:bg-white`}
           >
             <div
-              className={`relative  text-gray-600 rounded-lg outline-none bg-white focus:bg-white`}
+              className={`relative text-gray-600 rounded-lg outline-none bg-white focus:bg-white`}
             >
               <label htmlFor="password" className="block font-medium mb-1">
                 Password

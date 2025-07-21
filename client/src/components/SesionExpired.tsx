@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import vite from "../../public/vite.svg";
+import vite from "../asset/vite.svg";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 function SessionExpired() {

@@ -1,6 +1,12 @@
 const Todo = require("../models/todoList");
+const twilio = require("twilio");
 const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
+
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_TOKEN;
+const client = twilio(accountSid, authToken);
+
 exports.getTodos = async (req, res) => {
   const userId = req.user._id;
 
@@ -10,7 +16,7 @@ exports.getTodos = async (req, res) => {
 
 exports.createTodo = async (req, res) => {
   const userId = req.user._id;
-  let { toDoList } = req.body;
+  let { toDoList, phoneNumber, whatsappOptIn } = req.body;
 
   toDoList = toDoList.map((task) => ({
     ...task,
@@ -18,11 +24,35 @@ exports.createTodo = async (req, res) => {
     done: task.done ?? false,
   }));
 
+  let updated;
   const existing = await Todo.findOne({ userId });
+
   if (existing) {
     existing.toDoList.push(...toDoList);
-    const updated = await existing.save();
-    return res.json({ message: "Todo updated", todo: updated });
+    updated = await existing.save();
+  } else {
+    updated = await Todo.create({ userId, toDoList });
+  }
+
+  // ✅ WhatsApp Notification
+  if (whatsappOptIn && phoneNumber) {
+    try {
+      const taskText = toDoList
+        .map((task, idx) => `${idx + 1}. ${task.title}`)
+        .join("\n");
+
+      const messageBody = `📝 You added new tasks to your TODO list:\n${taskText}`;
+
+      await client.messages.create({
+        body: messageBody,
+        from: "whatsapp:+14155238886", // Twilio sandbox sender
+        to: `whatsapp:${phoneNumber}`, // e.g. whatsapp:+91xxxxxxxxxx
+      });
+
+      console.log("WhatsApp notification sent ✅");
+    } catch (error) {
+      console.error("❌ WhatsApp send failed", error.message);
+    }
   }
 
   const newTodo = await Todo.create({ userId, toDoList });

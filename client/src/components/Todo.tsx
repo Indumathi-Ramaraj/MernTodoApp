@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 
 const TodoApp = () => {
   const [task, setTask] = useState("");
+  const [whatsapp, setWhatsapp] = useState(false);
   const [todos, setTodos] = useState<Todo>([]);
   const userString = Cookies.get("user");
   const user = userString ? JSON.parse(userString) : null;
@@ -28,7 +29,7 @@ const TodoApp = () => {
 
   const addTask = () => {
     if (task.trim()) {
-      postTodo(user?.id, [
+      postTodo(user?.id, whatsapp, user.phoneNumber, [
         {
           title: task,
           done: false,
@@ -79,7 +80,7 @@ const TodoApp = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6">
         <div className="flex justify-between items-center w-full mb-4">
           <h1 className="text-2xl font-bold text-center flex-1">📝 Todo App</h1>
           <Link
@@ -92,6 +93,15 @@ const TodoApp = () => {
           >
             Sign out
           </Link>
+        </div>
+        <div className="flex justify-center items-center mb-4 gap-x-2">
+          <input
+            type="checkbox"
+            onChange={() => {
+              setWhatsapp(!whatsapp);
+            }}
+          />
+          <label>Require whatsapp message</label>
         </div>
 
         <div className="flex gap-2 mb-4">

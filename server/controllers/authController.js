@@ -2,16 +2,22 @@ const EmployeeModel = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, phoneNumber } = req.body;
 
   const existing = await EmployeeModel.findOne({ email });
+
   if (existing) {
     return res.status(400).json({ message: "Email already exists" });
   }
 
-  const user = await EmployeeModel.create({ name, email, password });
+  const user = await EmployeeModel.create({
+    name,
+    email,
+    password,
+    phone_number: phoneNumber,
+  });
   const { _id } = user;
-  res.json({ message: "success", user: { id: _id, name, email } });
+  res.json({ message: "success", user: { id: _id, name, email, phoneNumber } });
 };
 
 exports.login = async (req, res) => {
@@ -47,6 +53,7 @@ exports.login = async (req, res) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      phoneNumber: user.phone_number,
       token,
     },
   });
