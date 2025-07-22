@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 const TodoApp = () => {
   const [task, setTask] = useState("");
   const [whatsapp, setWhatsapp] = useState(false);
+  const [emailOption, setEmailOption] = useState(false);
   const [todos, setTodos] = useState<Todo>([]);
   const userString = Cookies.get("user");
   const user = userString ? JSON.parse(userString) : null;
@@ -26,7 +27,7 @@ const TodoApp = () => {
 
   const addTask = () => {
     if (task.trim()) {
-      postTodo(user?.id, whatsapp, user.phoneNumber, [
+      postTodo(user?.id, whatsapp, emailOption, user.email, user.phoneNumber, [
         {
           title: task,
           done: false,
@@ -42,7 +43,10 @@ const TodoApp = () => {
   };
 
   const toggleDone = (id: number, title: string, done: boolean) => {
-    updateTodo(user?.id, whatsapp, user.phoneNumber, { id, done })
+    updateTodo(user?.id, whatsapp, emailOption, user.email, user.phoneNumber, {
+      id,
+      done,
+    })
       .then(() => {
         toast.success(
           `${
@@ -63,7 +67,14 @@ const TodoApp = () => {
   };
 
   const toggleDelete = (id: number, title: string) => {
-    deleteTodo(user?.id, whatsapp, user.phoneNumber, id)
+    deleteTodo(
+      user?.id,
+      whatsapp,
+      emailOption,
+      user.email,
+      user.phoneNumber,
+      id
+    )
       .then(() => {
         toast.success(`Successfully deleted the todo with title ${title}`);
         setTodos(todos.filter((todo) => todo._id !== id));
@@ -98,15 +109,17 @@ const TodoApp = () => {
           </Link>
         </div>
         <div className="flex justify-center items-center mb-4 gap-x-2">
-          <input
-            type="checkbox"
-            onChange={() => {
-              setWhatsapp(!whatsapp);
-            }}
-          />
+          <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
           <label>Require whatsapp message</label>
         </div>
 
+        <div className="flex justify-center items-center mb-4 gap-x-2">
+          <input
+            type="checkbox"
+            onChange={() => setEmailOption(!emailOption)}
+          />
+          <label>Require email notification</label>
+        </div>
         <div className="flex gap-2 mb-4">
           <input
             type="text"

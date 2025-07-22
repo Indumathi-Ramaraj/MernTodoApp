@@ -9,11 +9,15 @@ export const getTodo = async (userId: string) => {
 export const postTodo = async (
   userId: string,
   whatsapp: boolean,
+  emailOption: boolean,
+  email: string,
   phoneNumber: number,
   toDoList: object
 ) => {
   let res = await axiosInstance.post(Endpoints.TODO(userId), {
     whatsappOptIn: whatsapp,
+    emailOptIn: emailOption,
+    email: email,
     phoneNumber,
     toDoList,
   });
@@ -23,11 +27,15 @@ export const postTodo = async (
 export const updateTodo = async (
   userId: string,
   whatsapp: boolean,
+  emailOption: boolean,
+  email: string,
   phoneNumber: number,
   { id, done }: { id: number; done: boolean }
 ) => {
   let res = await axiosInstance.put(Endpoints.TODO(userId), {
     whatsappOptIn: whatsapp,
+    emailOptIn: emailOption,
+    email: email,
     phoneNumber,
     id,
     done,
@@ -38,11 +46,19 @@ export const updateTodo = async (
 export const deleteTodo = async (
   userId: string,
   whatsapp: boolean,
+  emailOption: boolean,
+  email: string,
   phoneNumber: number,
   id: number
 ) => {
   let res = await axiosInstance.delete(Endpoints.TODO(userId), {
-    data: { id, whatsappOptIn: whatsapp, phoneNumber },
+    data: {
+      id,
+      whatsappOptIn: whatsapp,
+      emailOptIn: emailOption,
+      email: email,
+      phoneNumber,
+    },
   });
   return res;
 };
