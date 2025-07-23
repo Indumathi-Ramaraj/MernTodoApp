@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { CheckCircle, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { deleteTodo, getTodo, postTodo, updateTodo } from "../action/todo";
 import Cookies from "js-cookie";
 import type { Todo } from "../type/todo";
 import { Link } from "react-router-dom";
+import { generateTimeIntervals } from "../utlis";
+import { todoColumns } from "./columns";
+import Modal from "./ui/Modal";
+import Table from "./ui/Table";
 
 const TodoApp = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [task, setTask] = useState("");
   const [whatsapp, setWhatsapp] = useState(false);
   const [emailOption, setEmailOption] = useState(false);
@@ -93,8 +97,8 @@ const TodoApp = () => {
   }, [user?.id]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6">
+    <div className="min-h-screen bg-gray-100 flex  p-4">
+      <div className="w-full p-6 bg-white rounded-lg shadow-xl">
         <div className="flex justify-between items-center w-full mb-4">
           <h1 className="text-2xl font-bold text-center flex-1">📝 Todo App</h1>
           <Link
@@ -103,74 +107,90 @@ const TodoApp = () => {
               Cookies.remove("user");
             }}
             to="/login"
-            className="bg-gray-400 text-white px-2 py-1 rounded-xl hover:bg-blue-600 transition"
+            className="bg-gray-400 text-white px-2 py-1 rounded-lg hover:bg-blue-600 transition font-medium cursor-pointer"
           >
             Sign out
           </Link>
         </div>
-        <div className="flex justify-center items-center mb-4 gap-x-2">
-          <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
-          <label>Require whatsapp message</label>
+        {/* Notification */}
+        <div className="flex justify-center items-center gap-x-10">
+          <div className="flex justify-center items-center mb-4 gap-x-2">
+            <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
+            <label>Require whatsapp message</label>
+          </div>
+          <div className="flex justify-center items-center mb-4 gap-x-2">
+            <input
+              type="checkbox"
+              onChange={() => setEmailOption(!emailOption)}
+            />
+            <label>Require email notification</label>
+          </div>
         </div>
 
-        <div className="flex justify-center items-center mb-4 gap-x-2">
-          <input
-            type="checkbox"
-            onChange={() => setEmailOption(!emailOption)}
-          />
-          <label>Require email notification</label>
-        </div>
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            placeholder="Enter a task..."
-            className="flex-1 p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            value={task}
-            onChange={(e: any) => setTask(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addTask()}
-          />
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          + Add Task
+        </button>
+        <Modal
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Add New Task"
+        >
+          <div>
+            <label className="block font-medium mb-1 text-gray-700 px-2">
+              Title
+            </label>
+            <input
+              type="text"
+              placeholder="Enter a task title..."
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          <div>
+            <label className="block font-medium mb-1 text-gray-700 px-2">
+              Description
+            </label>
+            <textarea
+              placeholder="Enter task Description..."
+              rows={3}
+              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          <div>
+            <label className="block font-medium mb-1 text-gray-700 px-2">
+              Due Date
+            </label>
+            <input
+              type="date"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          <div>
+            <label className="block font-medium mb-1 text-gray-700 px-2">
+              Due Time
+            </label>
+            <select className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400">
+              {generateTimeIntervals().map((time) => (
+                <option key={time.value} value={time.value}>
+                  {time.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <button
             onClick={addTask}
-            className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full mt-4"
           >
-            Add
+            Add Task
           </button>
-        </div>
+        </Modal>
 
-        <ul className="space-y-2">
-          {todos.map((todo) => (
-            <li
-              key={todo._id}
-              className="flex items-center justify-between bg-gray-50 p-3 rounded-xl shadow-sm"
-            >
-              <span
-                className={`flex-1 ${
-                  todo.done ? "line-through text-gray-400" : ""
-                }`}
-              >
-                {todo.title}
-              </span>
-              <button
-                onClick={() => {
-                  if (todo._id) toggleDone(todo._id, todo.title, !todo.done);
-                }}
-              >
-                <CheckCircle
-                  className={`w-5 h-5 mr-2 ${
-                    todo.done ? "text-green-500" : "text-gray-400"
-                  }`}
-                />
-              </button>
-              <button
-                onClick={() => {
-                  if (todo._id) toggleDelete(todo._id, todo.title);
-                }}
-              >
-                <Trash2 className="w-5 h-5 text-red-500" />
-              </button>
-            </li>
-          ))}
-        </ul>
+        <Table data={todos} columns={todoColumns(toggleDone, toggleDelete)} />
+      
       </div>
     </div>
   );
