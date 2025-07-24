@@ -55,8 +55,6 @@ exports.createTodo = async (req, res) => {
       console.error("❌ WhatsApp send failed", error.message);
     }
   }
-  
-  
 
   // ✅ Email Notification
   if (emailOptIn && email) {
@@ -67,7 +65,7 @@ exports.createTodo = async (req, res) => {
       await sendEmail(email, subject, message);
       console.log("📧 Email notification sent ✅");
     } catch (error) {
-      console.error("❌ Email send failed", error.message);  
+      console.error("❌ Email send failed", error.message);
     }
   }
 

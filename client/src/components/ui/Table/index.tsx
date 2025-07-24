@@ -72,7 +72,10 @@ const Table = forwardRef<HTMLDivElement, TodoTableProps>(
       getPaginationRowModel: getPaginationRowModel(),
       onSortingChange: setSorting,
       globalFilterFn: filterFns.includesString,
+      enableRowSelection: true,
     });
+
+    const selectedRows = table.getSelectedRowModel().rows;
 
     return (
       <div ref={ref} className="p-4 space-y-4">
@@ -81,7 +84,11 @@ const Table = forwardRef<HTMLDivElement, TodoTableProps>(
             globalFilter={globalFilter}
             setGlobalFilter={setGlobalFilter}
           />
-          {csvDownload(table.options.data)}
+          {csvDownload(
+            selectedRows.length > 0
+              ? selectedRows.map((row) => row.original)
+              : table.options.data
+          )}
         </div>
 
         <div className="overflow-auto">

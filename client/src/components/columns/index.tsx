@@ -1,10 +1,32 @@
 import { CheckCircle, Trash2 } from "lucide-react";
-
+import dayjs from "dayjs";
+import { Row } from "@tanstack/react-table";
 export const todoColumns = (
   toggleDone: (id: number, title: string, done: boolean) => void,
   toggleDelete: (id: number, title: string) => void
 ) => {
   return [
+    {
+      id: "select",
+      header: ({ table }: any) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
+      cell: ({ row }: { row: Row<any> }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          disabled={!row.getCanSelect()}
+          onChange={row.getToggleSelectedHandler()}
+        />
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 50,
+    },
     {
       header: "Title",
       accessorKey: "title",
@@ -22,14 +44,23 @@ export const todoColumns = (
     },
     {
       header: "Due Date",
-      accessorKey: "date",
+      accessorKey: "dueDate",
       enableColumnFilter: true,
       enableGlobalFilter: true,
       sortingFn: "datetime",
+      cell: ({ row }: any) => {
+        return (
+          <div>
+            {row.original.dueDate
+              ? dayjs(row.original.dueDate).format("DD/MM/YYYY")
+              : ""}
+          </div>
+        );
+      },
     },
     {
       header: "Due Time",
-      accessorKey: "time",
+      accessorKey: "dueTime",
       enableColumnFilter: true,
       enableGlobalFilter: true,
       sortingFn: "datetime",

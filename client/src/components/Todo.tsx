@@ -8,10 +8,16 @@ import { generateTimeIntervals } from "../utlis";
 import { todoColumns } from "./columns";
 import Modal from "./ui/Modal";
 import Table from "./ui/Table";
+import { Button } from "./ui/Button";
 
 const TodoApp = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [task, setTask] = useState("");
+  const [task, setTask] = useState({
+    title: "",
+    description: "",
+    dueDate: "",
+    dueTime: "",
+  });
   const [whatsapp, setWhatsapp] = useState(false);
   const [emailOption, setEmailOption] = useState(false);
   const [todos, setTodos] = useState<Todo>([]);
@@ -30,10 +36,13 @@ const TodoApp = () => {
   };
 
   const addTask = () => {
-    if (task.trim()) {
+    if (task.title.trim()) {
       postTodo(user?.id, whatsapp, emailOption, user.email, user.phoneNumber, [
         {
-          title: task,
+          title: task.title,
+          description: task.description,
+          dueDate: task.dueDate,
+          dueTime: task.dueTime,
           done: false,
         },
       ])
@@ -42,7 +51,12 @@ const TodoApp = () => {
           setTodos(res.todo);
         })
         .catch(() => toast.error("Error in adding the todo list"));
-      setTask("");
+      setTask({
+        title: "",
+        description: "",
+        dueDate: "",
+        dueTime: "",
+      });
     }
   };
 
@@ -140,23 +154,35 @@ const TodoApp = () => {
         >
           <div>
             <label className="block font-medium mb-1 text-gray-700 px-2">
-              Title
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               placeholder="Enter a task title..."
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
+              value={task.title}
+              onChange={(e) =>
+                setTask((prev) => {
+                  return { ...prev, title: e.target.value };
+                })
+              }
               className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+              name="title"
             />
           </div>
           <div>
             <label className="block font-medium mb-1 text-gray-700 px-2">
-              Description
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
+              name="description"
               placeholder="Enter task Description..."
               rows={3}
+              value={task.description}
+              onChange={(e) =>
+                setTask((prev) => {
+                  return { ...prev, description: e.target.value };
+                })
+              }
               className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -165,15 +191,32 @@ const TodoApp = () => {
               Due Date
             </label>
             <input
+              name="dueDate"
               type="date"
               className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+              value={task.dueDate}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) =>
+                setTask((prev) => {
+                  return { ...prev, dueDate: e.target.value };
+                })
+              }
             />
           </div>
           <div>
             <label className="block font-medium mb-1 text-gray-700 px-2">
               Due Time
             </label>
-            <select className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400">
+            <select
+              name="dueTime"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+              value={task.dueTime}
+              onChange={(e) =>
+                setTask((prev) => {
+                  return { ...prev, dueTime: e.target.value };
+                })
+              }
+            >
               {generateTimeIntervals().map((time) => (
                 <option key={time.value} value={time.value}>
                   {time.label}
@@ -181,16 +224,20 @@ const TodoApp = () => {
               ))}
             </select>
           </div>
-          <button
-            onClick={addTask}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full mt-4"
+          <Button
+            disabled={!task.title && !task.description}
+            onClick={() => {
+              if (task.title && task.description) {
+                addTask();
+              }
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Add Task
-          </button>
+          </Button>
         </Modal>
 
         <Table data={todos} columns={todoColumns(toggleDone, toggleDelete)} />
-      
       </div>
     </div>
   );

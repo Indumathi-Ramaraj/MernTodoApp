@@ -126,7 +126,6 @@ export default function Signup() {
   };
 
 
-console.log("authValues.phoneNumber.length..",authValues.phoneNumber.length);
   const handleChangePassword = (type: PasswordType, value: string) => {
     let passwordState: PasswordFields;
     if (type === "password") {

@@ -12,6 +12,7 @@
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.10.0",
+    "dayjs": "^1.11.13",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.525.0",
