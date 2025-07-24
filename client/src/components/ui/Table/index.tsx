@@ -13,35 +13,14 @@ import GlobalFilter from "./globalFilter";
 import ColumnFilter from "./columnFilter";
 import { filterFns } from "@tanstack/react-table";
 import { csvDownload } from "./csvDownload";
-
-export interface RefObject {
-  setGlobalFilter: Function;
-  globalFilter: string;
-}
-
-interface TodoTableProps {
-  data: any[];
-  columns: any[];
-}
-
-interface ColumnFilter {
-  id: string;
-  value: unknown;
-}
-
-interface GlobalFilter {
-  globalFilter: any;
-}
-type ColumnFiltersState = ColumnFilter[];
-
-type ColumnSort = {
-  id: string;
-  desc: boolean;
-};
-type SortingState = ColumnSort[];
+import {
+  ColumnFiltersState,
+  SortingState,
+  TodoTableProps,
+} from "../../../type/table";
 
 const Table = forwardRef<HTMLDivElement, TodoTableProps>(
-  ({ data, columns }, ref) => {
+  ({ data, columns, setNewModalOpen }, ref) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState<string>("");
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -78,17 +57,25 @@ const Table = forwardRef<HTMLDivElement, TodoTableProps>(
     const selectedRows = table.getSelectedRowModel().rows;
 
     return (
-      <div ref={ref} className="p-4 space-y-4">
-        <div className="flex gap-x-4 items-center">
-          <GlobalFilter
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
-          {csvDownload(
-            selectedRows.length > 0
-              ? selectedRows.map((row) => row.original)
-              : table.options.data
-          )}
+      <div ref={ref} className="py-4 px-10 space-y-4 my-5 shadow-lg rounded-lg">
+        <div className="flex justify-between">
+          <div className="flex gap-x-4 items-center">
+            <GlobalFilter
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
+            />
+            {csvDownload(
+              selectedRows.length > 0
+                ? selectedRows.map((row) => row.original)
+                : table.options.data
+            )}
+          </div>
+          <button
+            onClick={() => setNewModalOpen(true)}
+            className="bg-blue-500 text-white px-4 py-1 h-8 my-auto rounded-lg"
+          >
+            + Add Task
+          </button>
         </div>
 
         <div className="overflow-auto">

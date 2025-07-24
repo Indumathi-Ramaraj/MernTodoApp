@@ -111,134 +111,130 @@ const TodoApp = () => {
   }, [user?.id]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex  p-4">
-      <div className="w-full p-6 bg-white rounded-lg shadow-xl">
-        <div className="flex justify-between items-center w-full mb-4">
-          <h1 className="text-2xl font-bold text-center flex-1">📝 Todo App</h1>
-          <Link
-            onClick={() => {
-              Cookies.remove("token");
-              Cookies.remove("user");
-            }}
-            to="/login"
-            className="bg-gray-400 text-white px-2 py-1 rounded-lg hover:bg-blue-600 transition font-medium cursor-pointer"
-          >
-            Sign out
-          </Link>
-        </div>
-        {/* Notification */}
-        <div className="flex justify-center items-center gap-x-10">
-          <div className="flex justify-center items-center mb-4 gap-x-2">
-            <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
-            <label>Require whatsapp message</label>
-          </div>
-          <div className="flex justify-center items-center mb-4 gap-x-2">
-            <input
-              type="checkbox"
-              onChange={() => setEmailOption(!emailOption)}
-            />
-            <label>Require email notification</label>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setIsOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+    <div className="w-full p-10 bg-white rounded-lg">
+      <div className="flex justify-between items-center w-full mb-4">
+        <h1 className="text-2xl font-bold text-center flex-1">📝 Todo App</h1>
+        <Link
+          onClick={() => {
+            Cookies.remove("token");
+            Cookies.remove("user");
+          }}
+          to="/login"
+          className="bg-gray-400 text-white px-2 py-1 rounded-lg hover:bg-blue-600 transition font-medium cursor-pointer"
         >
-          + Add Task
-        </button>
-        <Modal
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          title="Add New Task"
-        >
-          <div>
-            <label className="block font-medium mb-1 text-gray-700 px-2">
-              Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter a task title..."
-              value={task.title}
-              onChange={(e) =>
-                setTask((prev) => {
-                  return { ...prev, title: e.target.value };
-                })
-              }
-              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
-              name="title"
-            />
-          </div>
-          <div>
-            <label className="block font-medium mb-1 text-gray-700 px-2">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="description"
-              placeholder="Enter task Description..."
-              rows={3}
-              value={task.description}
-              onChange={(e) =>
-                setTask((prev) => {
-                  return { ...prev, description: e.target.value };
-                })
-              }
-              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-          <div>
-            <label className="block font-medium mb-1 text-gray-700 px-2">
-              Due Date
-            </label>
-            <input
-              name="dueDate"
-              type="date"
-              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
-              value={task.dueDate}
-              min={new Date().toISOString().split("T")[0]}
-              onChange={(e) =>
-                setTask((prev) => {
-                  return { ...prev, dueDate: e.target.value };
-                })
-              }
-            />
-          </div>
-          <div>
-            <label className="block font-medium mb-1 text-gray-700 px-2">
-              Due Time
-            </label>
-            <select
-              name="dueTime"
-              className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
-              value={task.dueTime}
-              onChange={(e) =>
-                setTask((prev) => {
-                  return { ...prev, dueTime: e.target.value };
-                })
-              }
-            >
-              {generateTimeIntervals().map((time) => (
-                <option key={time.value} value={time.value}>
-                  {time.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Button
-            disabled={!task.title && !task.description}
-            onClick={() => {
-              if (task.title && task.description) {
-                addTask();
-              }
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add Task
-          </Button>
-        </Modal>
-
-        <Table data={todos} columns={todoColumns(toggleDone, toggleDelete)} />
+          Sign out
+        </Link>
       </div>
+      {/* Notification */}
+      <div className="flex justify-center items-center gap-x-10">
+        <div className="flex justify-center items-center mb-4 gap-x-2">
+          <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
+          <label>Require whatsapp message</label>
+        </div>
+        <div className="flex justify-center items-center mb-4 gap-x-2">
+          <input
+            type="checkbox"
+            onChange={() => setEmailOption(!emailOption)}
+          />
+          <label>Require email notification</label>
+        </div>
+      </div>
+
+      <Modal
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Add New Task"
+      >
+        <div>
+          <label className="block font-medium mb-1 text-gray-700 px-2">
+            Title <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter a task title..."
+            value={task.title}
+            onChange={(e) =>
+              setTask((prev) => {
+                return { ...prev, title: e.target.value };
+              })
+            }
+            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+            name="title"
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1 text-gray-700 px-2">
+            Description <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            name="description"
+            placeholder="Enter task Description..."
+            rows={3}
+            value={task.description}
+            onChange={(e) =>
+              setTask((prev) => {
+                return { ...prev, description: e.target.value };
+              })
+            }
+            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1 text-gray-700 px-2">
+            Due Date
+          </label>
+          <input
+            name="dueDate"
+            type="date"
+            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+            value={task.dueDate}
+            min={new Date().toISOString().split("T")[0]}
+            onChange={(e) =>
+              setTask((prev) => {
+                return { ...prev, dueDate: e.target.value };
+              })
+            }
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1 text-gray-700 px-2">
+            Due Time
+          </label>
+          <select
+            name="dueTime"
+            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400"
+            value={task.dueTime}
+            onChange={(e) =>
+              setTask((prev) => {
+                return { ...prev, dueTime: e.target.value };
+              })
+            }
+          >
+            {generateTimeIntervals().map((time) => (
+              <option key={time.value} value={time.value}>
+                {time.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button
+          disabled={!task.title && !task.description}
+          onClick={() => {
+            if (task.title && task.description) {
+              addTask();
+            }
+          }}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add Task
+        </Button>
+      </Modal>
+
+      <Table
+        data={todos}
+        columns={todoColumns(toggleDone, toggleDelete)}
+        setNewModalOpen={setIsOpen}
+      />
     </div>
   );
 };
