@@ -53,8 +53,19 @@ const Table = forwardRef<HTMLDivElement, TodoTableProps>(
       globalFilterFn: filterFns.includesString,
       enableRowSelection: true,
     });
-
+    const rows = table.getRowModel().rows;
     const selectedRows = table.getSelectedRowModel().rows;
+    const pageSize = table.getState().pagination.pageSize;
+    const currentPage = table.getState().pagination.pageIndex;
+    const totalRows = table.getFilteredRowModel().rows.length;
+    const setPageSize = table.setPageSize;
+    const pageRowCount = () => {
+      const start = currentPage * pageSize + 1;
+      const end = Math.min(start + pageSize - 1, totalRows);
+      return { start, end, total: totalRows };
+    };
+
+    const { start, end, total } = pageRowCount();
 
     return (
       <div ref={ref} className="py-4 px-10 space-y-4 my-5 shadow-lg rounded-lg">
@@ -69,6 +80,28 @@ const Table = forwardRef<HTMLDivElement, TodoTableProps>(
                 ? selectedRows.map((row) => row.original)
                 : table.options.data
             )}
+            <div className="flex gap-x-1">
+              <p className="text-sm pt-0.5">Show : </p>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className=" text-gray-600 rounded-md border border-gray-300 outline-none bg-white h-7 px-2"
+              >
+                {[10, 20, 30, 40, 50, rows.length].map((size) => (
+                  <option key={size} value={size}>
+                    {size === rows.length ? rows.length : size}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="ml-2 text-sm flex gap-x-1">
+              <p>Showing</p>
+              <p>
+                {start} - {end}
+              </p>
+              <p>of {total}</p>
+            </div>
           </div>
           <button
             onClick={() => setNewModalOpen(true)}

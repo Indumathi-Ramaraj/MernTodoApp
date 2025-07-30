@@ -9,6 +9,9 @@ import { todoColumns } from "./columns";
 import Modal from "./ui/Modal";
 import Table from "./ui/Table";
 import { Button } from "./ui/Button";
+import { Send } from "lucide-react";
+
+const telegramUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
 
 const TodoApp = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +23,7 @@ const TodoApp = () => {
   });
   const [whatsapp, setWhatsapp] = useState(false);
   const [emailOption, setEmailOption] = useState(false);
+  const [telegramOption, setTelegramOption] = useState(false);
   const [todos, setTodos] = useState<Todo>([]);
   const userString = Cookies.get("user");
   const user = userString ? JSON.parse(userString) : null;
@@ -37,15 +41,23 @@ const TodoApp = () => {
 
   const addTask = () => {
     if (task.title.trim()) {
-      postTodo(user?.id, whatsapp, emailOption, user.email, user.phoneNumber, [
-        {
-          title: task.title,
-          description: task.description,
-          dueDate: task.dueDate,
-          dueTime: task.dueTime,
-          done: false,
-        },
-      ])
+      postTodo(
+        user?.id,
+        whatsapp,
+        emailOption,
+        telegramOption,
+        user.email,
+        user.phoneNumber,
+        [
+          {
+            title: task.title,
+            description: task.description,
+            dueDate: task.dueDate,
+            dueTime: task.dueTime,
+            done: false,
+          },
+        ]
+      )
         .then((res) => {
           toast.success("Successfully added the todo");
           setTodos(res.todo);
@@ -129,7 +141,7 @@ const TodoApp = () => {
       <div className="flex justify-center items-center gap-x-10">
         <div className="flex justify-center items-center mb-4 gap-x-2">
           <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
-          <label>Require whatsapp message</label>
+          <label>Require whatsapp notification</label>
         </div>
         <div className="flex justify-center items-center mb-4 gap-x-2">
           <input
@@ -137,6 +149,36 @@ const TodoApp = () => {
             onChange={() => setEmailOption(!emailOption)}
           />
           <label>Require email notification</label>
+        </div>
+        <div className="flex justify-center items-center mb-4 gap-x-2">
+          <input
+            type="checkbox"
+            checked={telegramOption}
+            onChange={() => {
+              if (user?.id) {
+                toast.warning(
+                  <span>
+                    Please link your to telegram and enable notifications.
+                    <a
+                      href={`https://t.me/${telegramUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                    >
+                      <Send className="w-4 h-4" />
+                      Link to Telegram
+                    </a>
+                    <span className="ml-1">Click</span>{" "}
+                    <p className="font-semibold">/start</p>
+                    <span className="ml-1">
+                      Send your email ID (same as registered) to the bot.
+                    </span>
+                  </span>
+                );
+              } else setTelegramOption(!telegramOption);
+            }}
+          />
+          <label>Require Telegram notification &nbsp;</label>
         </div>
       </div>
 

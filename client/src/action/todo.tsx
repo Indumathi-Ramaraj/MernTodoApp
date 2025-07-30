@@ -10,6 +10,7 @@ export const postTodo = async (
   userId: string,
   whatsapp: boolean,
   emailOption: boolean,
+  telegram: boolean,
   email: string,
   phoneNumber: number,
   toDoList: object
@@ -17,6 +18,7 @@ export const postTodo = async (
   let res = await axiosInstance.post(Endpoints.TODO(userId), {
     whatsappOptIn: whatsapp,
     emailOptIn: emailOption,
+    telegramOptIn: telegram,
     email: email,
     phoneNumber,
     toDoList,

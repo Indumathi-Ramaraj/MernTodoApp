@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     unique: true,
-    match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"],
+    match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"], 
   },
   hashed_password: {
     type: String,
@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
   },
   salt: String,
   createdAt: { type: Date, default: Date.now },
+  telegramChatId: {
+    type: String,
+    default: null,
+  },
 });
 
 userSchema

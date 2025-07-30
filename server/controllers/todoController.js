@@ -8,6 +8,7 @@ const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
 const client = twilio(accountSid, authToken);
 
+
 exports.getTodos = async (req, res) => {
   const userId = req.user._id;
 
@@ -17,7 +18,18 @@ exports.getTodos = async (req, res) => {
 
 exports.createTodo = async (req, res) => {
   const userId = req.user._id;
-  let { toDoList, phoneNumber, whatsappOptIn, emailOptIn, email } = req.body;
+  let {
+    toDoList,
+    phoneNumber,
+    whatsappOptIn,
+    emailOptIn,
+    email,
+    telegramOptIn,
+    telegramChatId,
+  } = req.body;
+
+  console.log("User ChatId:", user.telegramChatId);
+  console.log("New TODO created:", title);
 
   toDoList = toDoList.map((task) => ({
     ...task,
@@ -25,7 +37,6 @@ exports.createTodo = async (req, res) => {
     done: task.done ?? false,
   }));
 
-  let updated;
   const existing = await Todo.findOne({ userId });
 
   if (existing) {
@@ -67,6 +78,18 @@ exports.createTodo = async (req, res) => {
     } catch (error) {
       console.error("❌ Email send failed", error.message);
     }
+  }
+  const user = await User.findById(userId);
+
+  // ✅ Telegram Notification
+  if (telegramOptIn && user.telegramChatId) {
+    await axios.post(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=<your_chat_id>&text=/start%20induammu223@gmail.com"`,
+      {
+        chat_id: user.telegramChatId,
+        text: `📝 You added new tasks to your TODO list:\n${taskText}`,
+      }
+    );
   }
 
   const finalTodo = await Todo.findOne({ userId });
@@ -135,6 +158,7 @@ exports.updateTodoStatus = async (req, res) => {
         console.error("❌ Email send failed", error.message);
       }
     }
+
     res.json({ message: "Todo updated", todo: updated });
   } catch (err) {
     console.error("Error updating todo:", err);
