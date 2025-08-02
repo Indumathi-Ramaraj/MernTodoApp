@@ -4,20 +4,39 @@ const jwt = require("jsonwebtoken");
 exports.signup = async (req, res) => {
   const { name, email, password, phoneNumber } = req.body;
 
-  const existing = await EmployeeModel.findOne({ email });
+  try {
+    const emailExists = await EmployeeModel.findOne({ email });
+    if (emailExists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
 
-  if (existing) {
-    return res.status(400).json({ message: "Email already exists" });
+    const phoneNumberExists = await EmployeeModel.findOne({ phone_number });
+    if (phoneNumberExists) {
+      return res.status(400).json({ message: "Phone Number already exists" });
+    }
+
+    const newUser = new EmployeeModel({
+      name,
+      email,
+      phone_number: phoneNumber,
+      password,
+    });
+
+    newUser.password = password;
+    await newUser.save();
+
+    return res.status(201).json({
+      message: "Signup successful",
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        telegramChatId: newUser.telegramChatId,
+      },
+    });
+  } catch (err) {
+    console.error("Signup error:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-
-  const user = await EmployeeModel.create({
-    name,
-    email,
-    password,
-    phone_number: phoneNumber,
-  });
-  const { _id } = user;
-  res.json({ message: "success", user: { id: _id, name, email, phoneNumber } });
 };
 
 exports.login = async (req, res) => {
@@ -36,7 +55,7 @@ exports.login = async (req, res) => {
   }
 
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "1d",
   });
 
   res.cookie("token", token, {
@@ -54,6 +73,7 @@ exports.login = async (req, res) => {
       name: user.name,
       email: user.email,
       phoneNumber: user.phone_number,
+      telegramChatId: user.telegramChatId,
       token,
     },
   });

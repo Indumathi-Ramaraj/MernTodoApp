@@ -5,7 +5,7 @@ export const signup = async (
   email: string,
   countryCode: string,
   phoneNumber: string,
-  password: string
+  password: string,
 ) => {
   let res = await axiosInstance.post(Endpoints.SIGN_UP, {
     name,

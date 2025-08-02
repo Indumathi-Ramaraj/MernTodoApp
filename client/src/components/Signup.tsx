@@ -10,7 +10,7 @@ import type {
   PasswordValidationType,
   ShowPasswordType,
 } from "../type/signup";
-import { CircleCheckBig, CircleX, Eye, EyeOff, Info } from "lucide-react";
+import { CircleCheckBig, CircleX, Eye, EyeOff, Info, Send } from "lucide-react";
 import backgroundTodo from "../asset/background.jpeg";
 
 const passwordValidationConstantList: Array<PasswordValidationType> = [
@@ -40,6 +40,8 @@ const passwordValidationConstantList: Array<PasswordValidationType> = [
     isValid: true,
   },
 ];
+
+const telegramUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
 
 export default function Signup() {
   const [authValues, setAuthValues] = useState<authValues>({
@@ -88,7 +90,6 @@ export default function Signup() {
     // Update state with new validation results
     setPasswordValidationConstants([...passwordValidationConstantsCloned]);
   };
-
   const handleSubmit = () => {
     signup(
       authValues.name,
@@ -98,7 +99,25 @@ export default function Signup() {
       password.password.value
     )
       .then((res) => {
-        if (res.message === "success") {
+        if (res.message === "Signup successful") {
+          if (!res.user.telegramChatId) {
+            toast.warning(
+              <span>
+                Please link your to telegram and enable notifications.
+                <a
+                  href={`https://t.me/${telegramUsername}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                >
+                  <Send className="w-4 h-4" />
+                  Link to Telegram
+                </a>
+                <span className="ml-1">Click</span>{" "}
+                <p className="font-semibold">/start</p>
+              </span>
+            );
+          }
           toast.success("Successfully Registered");
           navigate("/login");
         } else toast.error(res.message);
@@ -363,6 +382,19 @@ export default function Signup() {
               Register
             </button>
           </form>
+          <div className="mt-4 text-center">
+            {/* Open Telegram manually with icon */}
+            <a
+              href={`https://t.me/${telegramUsername}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+            >
+              <Send size={18} />
+              <span>Link to Telegram</span>
+            </a>
+          </div>
+
           <p className="mt-4 text-center text-sm">Already have an account?</p>
           <Link
             to="/login"

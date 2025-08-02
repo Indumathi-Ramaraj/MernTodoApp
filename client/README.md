@@ -58,3 +58,4 @@ Development Environment:
 - [http://localhost:3000/todo] – Todo List
 - [http://localhost:3000/session-expired] – Session Expired
 
+`ngrok start --all --config ~/.ngrok2/ngrok.yaml` 

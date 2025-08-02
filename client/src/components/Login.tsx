@@ -4,8 +4,10 @@ import { toast } from "react-toastify";
 import { login } from "../action/login";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Send } from "lucide-react";
 import backgroundTodo from "../asset/background.jpeg";
+
+const telegramUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [validation, setValidation] = useState(false);
@@ -21,6 +23,27 @@ export default function Login() {
         .then((res) => {
           if (res.message === "success") {
             toast.success("Login Successfully");
+            if (!res.user.telegramChatId) {
+              toast.warning(
+                <span>
+                  Please link your to telegram and enable notifications.
+                  <a
+                    href={`https://t.me/${telegramUsername}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                  >
+                    <Send className="w-4 h-4" />
+                    Link to Telegram
+                  </a>
+                  <span className="ml-1">Click</span>{" "}
+                  <p className="font-semibold">/start</p>
+                </span>
+              );
+              alert(
+                `Please link your Telegram account to enable notifications.\nVisit: https://t.me/${telegramUsername}.\nClick /start`
+              );
+            }
             navigate("/todo");
           } else toast.error(res.data.message);
         })
@@ -57,7 +80,7 @@ export default function Login() {
               LOGIN
             </h2>
             <form
-              onSubmit={(event: any) => {
+              onSubmit={(event) => {
                 setValidation(true);
                 event.preventDefault();
                 formik.handleSubmit();
@@ -131,6 +154,18 @@ export default function Login() {
               >
                 Login
               </button>
+              <div className="mt-4 text-center">
+                {/* Open Telegram manually with icon */}
+                <a
+                  href={`https://t.me/${telegramUsername}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                >
+                  <Send size={18} />
+                  <span>Link to Telegram</span>
+                </a>
+              </div>
               <div className="flex justify-center items-center mt-4">
                 <div className="flex gap-x-2">
                   <h5>New Here?</h5>
