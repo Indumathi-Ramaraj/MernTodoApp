@@ -10,6 +10,8 @@ import Modal from "./ui/Modal";
 import Table from "./ui/Table";
 import { Button } from "./ui/Button";
 import { Send } from "lucide-react";
+import { useLoading } from "../context/LodingContext";
+import { userType } from "../type/signup";
 
 const telegramUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
 
@@ -28,7 +30,9 @@ const TodoApp = () => {
   const [telegramOption, setTelegramOption] = useState(false);
   const [todos, setTodos] = useState<Todo>([]);
   const userString = Cookies.get("user");
-  const user = userString ? JSON.parse(userString) : null;
+  const user: userType = userString ? JSON.parse(userString) : null;
+
+  const { setIsLoading } = useLoading();
 
   const getTodos = (id: string) => {
     getTodo(id)
@@ -42,6 +46,7 @@ const TodoApp = () => {
   };
 
   const addTask = () => {
+    setIsLoading(true);
     if (task.title.trim()) {
       postTodo(
         user?.id,
@@ -64,12 +69,16 @@ const TodoApp = () => {
           toast.success("Successfully added the todo");
           setTodos(res.todo);
         })
-        .catch(() => toast.error("Error in adding the todo list"));
-      setTask(todoInitialState);
+        .catch(() => toast.error("Error in adding the todo list"))
+        .finally(() => {
+          setIsLoading(false);
+          setTask(todoInitialState);
+        });
     }
   };
 
   const toggleDone = (id: number, title: string, done: boolean) => {
+    setIsLoading(true);
     updateTodo(
       user?.id,
       whatsapp,
@@ -99,10 +108,14 @@ const TodoApp = () => {
         toast.error(
           `Error in updating ${title} to done. Reason:${err.response.data.error}`
         )
-      );
+      )
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const toggleDelete = (id: number, title: string) => {
+    setIsLoading(true);
     deleteTodo(
       user?.id,
       whatsapp,
@@ -120,7 +133,10 @@ const TodoApp = () => {
         toast.error(
           `Error in deleting the todo. Reason: ${err.response.data.error}`
         )
-      );
+      )
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -131,8 +147,14 @@ const TodoApp = () => {
 
   return (
     <div className="w-full p-10 bg-white rounded-lg">
-      <div className="flex justify-between items-center w-full mb-4">
-        <h1 className="text-2xl font-bold text-center flex-1">📝 Todo App</h1>
+      <div className="flex justify-center items-center mb-8">
+        <div className="flex flex-col mx-auto">
+          <h1 className="text-3xl font-bold text-center">
+            Welcome {user?.name}
+          </h1>
+          <h1 className="text-2xl font-bold text-center mt-4">📝 Todo App</h1>
+        </div>
+        <div className="flex-col justify-center items-center"></div>
         <Link
           onClick={() => {
             Cookies.remove("token");
@@ -144,6 +166,7 @@ const TodoApp = () => {
           Sign out
         </Link>
       </div>
+
       {/* Notification */}
       <div className="flex justify-center items-center gap-x-10">
         <div className="flex justify-center items-center mb-4 gap-x-2">

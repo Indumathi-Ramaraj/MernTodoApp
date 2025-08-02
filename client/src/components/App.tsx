@@ -8,29 +8,34 @@ import SessionExpired from "./SesionExpired";
 import TodoApp from "./Todo";
 import ErrorBoundary from "./ErrorBoundary";
 import TestErrorComponent from "./TestErrorBoundary";
+import { LoadingProvider } from "../context/LodingContext";
+import GlobalLoader from "./GlobalLoader";
 
 function App() {
   return (
-    <div>
-      <ErrorBoundary>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/todo" element={<TodoApp />} />
-            <Route path="/session-expired" element={<SessionExpired />} />
-            <Route path="/test" element={<TestErrorComponent />} />
-          </Routes>
-        </Router>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          theme="light"
-        />
-      </ErrorBoundary>
-    </div>
+    <LoadingProvider>
+      <GlobalLoader />
+      <div>
+        <ErrorBoundary>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/todo" element={<TodoApp />} />
+              <Route path="/session-expired" element={<SessionExpired />} />
+              <Route path="/test" element={<TestErrorComponent />} />
+            </Routes>
+          </Router>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            theme="light"
+          />
+        </ErrorBoundary>
+      </div>
+    </LoadingProvider>
   );
 }
 
