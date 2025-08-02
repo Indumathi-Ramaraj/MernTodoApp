@@ -29,16 +29,14 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://localhost:8000",
-      "https://0603ba759afd.ngrok-free.app",
-      "https://80831853cf95.ngrok-free.app",
+      "https://09bdce7755d1.ngrok-free.app",
+      "https://a99fdc7ccdf8.ngrok-free.app",
       "https://mern-todo-backend-88mz.onrender.com",
       "https://mern-todo-app-tan.vercel.app",
     ],
     credentials: true,
   })
 );
-
-
 
 //db
 mongoose

@@ -43,9 +43,8 @@ export default function Login() {
               alert(
                 `Please link your Telegram account to enable notifications.\nVisit: https://t.me/${telegramUsername}.\nClick /start`
               );
-
-              navigate("/todo");
             }
+            navigate("/todo");
           } else toast.error(res.data.message);
         })
         .catch((err) => {
@@ -81,7 +80,7 @@ export default function Login() {
               LOGIN
             </h2>
             <form
-              onSubmit={(event: any) => {
+              onSubmit={(event) => {
                 setValidation(true);
                 event.preventDefault();
                 formik.handleSubmit();

@@ -13,14 +13,16 @@ import { Send } from "lucide-react";
 
 const telegramUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
 
+const todoInitialState = {
+  title: "",
+  description: "",
+  dueDate: "",
+  dueTime: "",
+};
+
 const TodoApp = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [task, setTask] = useState({
-    title: "",
-    description: "",
-    dueDate: "",
-    dueTime: "",
-  });
+  const [task, setTask] = useState(todoInitialState);
   const [whatsapp, setWhatsapp] = useState(false);
   const [emailOption, setEmailOption] = useState(false);
   const [telegramOption, setTelegramOption] = useState(false);
@@ -63,20 +65,24 @@ const TodoApp = () => {
           setTodos(res.todo);
         })
         .catch(() => toast.error("Error in adding the todo list"));
-      setTask({
-        title: "",
-        description: "",
-        dueDate: "",
-        dueTime: "",
-      });
+      setTask(todoInitialState);
     }
   };
 
   const toggleDone = (id: number, title: string, done: boolean) => {
-    updateTodo(user?.id, whatsapp, emailOption, user.email, user.phoneNumber, {
-      id,
-      done,
-    })
+    updateTodo(
+      user?.id,
+      whatsapp,
+      emailOption,
+      telegramOption,
+      user.email,
+      user.phoneNumber,
+      user.telegramChatId,
+      {
+        id,
+        done,
+      }
+    )
       .then(() => {
         toast.success(
           `${
@@ -101,6 +107,7 @@ const TodoApp = () => {
       user?.id,
       whatsapp,
       emailOption,
+      telegramOption,
       user.email,
       user.phoneNumber,
       id
@@ -155,7 +162,7 @@ const TodoApp = () => {
             type="checkbox"
             checked={telegramOption}
             onChange={() => {
-              if (user?.id) {
+              if (!user?.telegramChatId) {
                 toast.warning(
                   <span>
                     Please link your to telegram and enable notifications.

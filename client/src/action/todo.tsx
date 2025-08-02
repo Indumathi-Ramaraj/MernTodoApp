@@ -2,7 +2,7 @@ import Endpoints from "../api/Endpoints";
 import axiosInstance from "../network";
 
 export const getTodo = async (userId: string) => {
-  let res = await axiosInstance.get(Endpoints.TODO(userId));
+  const res = await axiosInstance.get(Endpoints.TODO(userId));
   return res.data;
 };
 
@@ -15,7 +15,7 @@ export const postTodo = async (
   phoneNumber: number,
   toDoList: object
 ) => {
-  let res = await axiosInstance.post(Endpoints.TODO(userId), {
+  const res = await axiosInstance.post(Endpoints.TODO(userId), {
     whatsappOptIn: whatsapp,
     emailOptIn: emailOption,
     telegramOptIn: telegram,
@@ -30,15 +30,19 @@ export const updateTodo = async (
   userId: string,
   whatsapp: boolean,
   emailOption: boolean,
+  telegram: boolean,
   email: string,
   phoneNumber: number,
+  telegramChatId: string,
   { id, done }: { id: number; done: boolean }
 ) => {
-  let res = await axiosInstance.put(Endpoints.TODO(userId), {
+  const res = await axiosInstance.put(Endpoints.TODO(userId), {
     whatsappOptIn: whatsapp,
     emailOptIn: emailOption,
+    telegramOptIn: telegram,
     email: email,
     phoneNumber,
+    telegramChatId,
     id,
     done,
   });
@@ -49,15 +53,18 @@ export const deleteTodo = async (
   userId: string,
   whatsapp: boolean,
   emailOption: boolean,
+  telegram: boolean,
   email: string,
+
   phoneNumber: number,
   id: number
 ) => {
-  let res = await axiosInstance.delete(Endpoints.TODO(userId), {
+  const res = await axiosInstance.delete(Endpoints.TODO(userId), {
     data: {
       id,
       whatsappOptIn: whatsapp,
       emailOptIn: emailOption,
+      telegramOptIn: telegram,
       email: email,
       phoneNumber,
     },
