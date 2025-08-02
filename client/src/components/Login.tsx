@@ -6,12 +6,14 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { Eye, EyeOff, Send } from "lucide-react";
 import backgroundTodo from "../asset/background.jpeg";
+import { useLoading } from "../context/LodingContext";
 
 const telegramUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [validation, setValidation] = useState(false);
   const navigate = useNavigate();
+  const { setIsLoading } = useLoading();
 
   const formik = useFormik({
     initialValues: {
@@ -19,6 +21,7 @@ export default function Login() {
       password: "",
     },
     onSubmit: () => {
+      setIsLoading(true);
       login(formik.values.email, formik.values.password)
         .then((res) => {
           if (res.message === "success") {
@@ -56,6 +59,9 @@ export default function Login() {
                 : "Error in logging the user"
             }`
           );
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     },
     validateOnBlur: false,

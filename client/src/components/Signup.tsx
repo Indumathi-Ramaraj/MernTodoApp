@@ -12,6 +12,7 @@ import type {
 } from "../type/signup";
 import { CircleCheckBig, CircleX, Eye, EyeOff, Info, Send } from "lucide-react";
 import backgroundTodo from "../asset/background.jpeg";
+import { useLoading } from "../context/LodingContext";
 
 const passwordValidationConstantList: Array<PasswordValidationType> = [
   {
@@ -69,10 +70,11 @@ export default function Signup() {
     useState<Array<PasswordValidationType>>(passwordValidationConstantList);
 
   const navigate = useNavigate();
+  const { setIsLoading } = useLoading();
 
   const checkPasswordValidation = (passwordValue: string) => {
     // Regular expressions for different password validation rules
-    const conditions: any = {
+    const conditions = {
       lowercase: /(?=.*[a-z])/,
       uppercase: /(?=.*[A-Z])/,
       digit: /(?=.*\d)/,
@@ -81,7 +83,7 @@ export default function Signup() {
     };
     // Map through validation constants and check if each condition is met
     const passwordValidationConstantsCloned = passwordValidationConstants.map(
-      (state: any) => {
+      (state) => {
         const condition = conditions[state.accessor];
         state.isValid = condition ? condition.test(passwordValue) : true;
         return state;
@@ -91,6 +93,7 @@ export default function Signup() {
     setPasswordValidationConstants([...passwordValidationConstantsCloned]);
   };
   const handleSubmit = () => {
+    setIsLoading(true);
     signup(
       authValues.name,
       authValues.email,
@@ -130,6 +133,9 @@ export default function Signup() {
               : "Error in registration"
           }`
         );
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -183,7 +189,7 @@ export default function Signup() {
         <div className="bg-white p-6 rounded-md w-full max-w-sm shadow-md">
           <h2 className="text-2xl font-semibold mb-4 text-center">REGISTER</h2>
           <form
-            onSubmit={(event: any) => {
+            onSubmit={(event) => {
               event.preventDefault();
               handleSubmit();
             }}
