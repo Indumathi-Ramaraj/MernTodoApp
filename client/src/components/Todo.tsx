@@ -35,6 +35,7 @@ const TodoApp = () => {
   const { setIsLoading } = useLoading();
 
   const getTodos = (id: string) => {
+    setIsLoading(true);
     getTodo(id)
       .then((res) => {
         const tasks = Array.isArray(res[0]?.toDoList) ? res[0].toDoList : [];
@@ -42,6 +43,9 @@ const TodoApp = () => {
       })
       .catch(() => {
         toast.error("Error in fetching the todo list");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
