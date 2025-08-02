@@ -34,3 +34,12 @@ export type authValues = {
   phoneNumber: string;
   countryCode: string;
 };
+
+export type userType = {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: number;
+  telegramChatId: string;
+  telegramOption: boolean;
+};
