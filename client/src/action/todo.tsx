@@ -71,3 +71,8 @@ export const deleteTodo = async (
   });
   return res;
 };
+
+export const searchQuery = async (query: string) => {
+  const res = await axiosInstance.post(Endpoints.GPT, { query });
+  return res.data;
+};

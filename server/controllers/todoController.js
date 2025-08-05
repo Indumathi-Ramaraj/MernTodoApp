@@ -296,3 +296,53 @@ exports.deleteTodoItem = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+function extractTaskName(query) {
+  if (!query || typeof query !== "string") return "";
+  return query
+    .replace(/what('?s| is)? the status of/i, "")
+    .replace(/\?$/, "")
+    .trim();
+}
+
+exports.queryItem = async (req, res) => {
+  try {
+    const { query } = req.body;
+    const userId = req.user._id;
+
+    const taskName = extractTaskName(query);
+
+    if (!taskName || taskName.length < 1) {
+      return res.status(400).json({ message: "Query is empty" });
+    }
+
+    const todo = await Todo.findOne({ userId });
+
+    if (!todo || !todo.toDoList || todo.toDoList.length === 0) {
+      return res.json({ message: `No tasks found for user.` });
+    }
+
+    const matchingTasks = todo.toDoList.filter((item) =>
+      new RegExp(taskName, "i").test(item.title)
+    );
+
+    if (matchingTasks.length === 0) {
+      return res.json({ message: `No task found for "${taskName}"` });
+    }
+
+    const taskSummaries = matchingTasks.map((task) => ({
+      title: task.title,
+      done: task.done,
+      dueDate: new Date(task.dueDate).toDateString(),
+      dueTime: task.dueTime,
+    }));
+
+    return res.json({
+      message: `${matchingTasks.length} task(s) found.`,
+      data: taskSummaries,
+    });
+  } catch (error) {
+    console.error("queryItem error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

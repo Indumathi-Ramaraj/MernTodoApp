@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { deleteTodo, getTodo, postTodo, updateTodo } from "../action/todo";
+import {
+  deleteTodo,
+  getTodo,
+  postTodo,
+  updateTodo,
+  searchQuery,
+} from "../action/todo";
 import Cookies from "js-cookie";
-import type { Todo } from "../type/todo";
+import type { QueryType, Todo } from "../type/todo";
 import { Link } from "react-router-dom";
 import { generateTimeIntervals } from "../utlis";
 import { todoColumns } from "./columns";
@@ -22,13 +28,40 @@ const todoInitialState = {
   dueTime: "",
 };
 
+const queryResultInitialState = {
+  view: false,
+  value: "",
+  result: {
+    data: [{ title: "", done: false, dueTime: "", dueDate: "" }],
+    message: "",
+  },
+};
+
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * TodoApp component provides the main interface for managing a user's todo list.
+ *
+ * Features:
+ * - Displays a welcome message with the user's name.
+ * - Allows users to sign out and navigate to the login page.
+ * - Provides options to enable WhatsApp, email, and Telegram notifications.
+ * - Includes a modal for adding new tasks with fields for title, description, due date, and due time.
+ * - Displays a table of todos with options to mark tasks as done, undone, or delete them.
+ * - Fetches todos upon component mount using the authenticated user's ID.
+ * - Handles task additions, updates, deletions, and error notifications through toast messages.
+ * - Integrates Search query functionality for additional features.
+ */
+
 const TodoApp = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [newModalOpen, setNewModalOpen] = useState(false);
   const [task, setTask] = useState(todoInitialState);
   const [whatsapp, setWhatsapp] = useState(false);
   const [emailOption, setEmailOption] = useState(false);
   const [telegramOption, setTelegramOption] = useState(false);
   const [todos, setTodos] = useState<Todo>([]);
+  const [queryData, setQueryData] = useState<QueryType>(
+    queryResultInitialState
+  );
   const userString = Cookies.get("user");
   const user: userType = userString ? JSON.parse(userString) : null;
 
@@ -149,9 +182,23 @@ const TodoApp = () => {
     }
   }, [user?.id]);
 
+  const searchData = (data: string) => {
+    setIsLoading(true);
+    searchQuery(data)
+      .then((response) => {
+        setQueryData((prev) => {
+          return { ...prev, result: response };
+        });
+      })
+      .catch(() => {
+        toast.error("Error fetching search response:");
+      })
+      .finally(() => setIsLoading(false));
+  };
+
   return (
     <div className="w-full p-10 bg-white rounded-lg">
-      <div className="flex justify-center items-center mb-8">
+      <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col mx-auto">
           <h1 className="text-3xl font-bold text-center">
             Welcome {user?.name}
@@ -173,18 +220,18 @@ const TodoApp = () => {
 
       {/* Notification */}
       <div className="flex justify-center items-center gap-x-10">
-        <div className="flex justify-center items-center mb-4 gap-x-2">
+        <div className="flex justify-center items-center mb-4 gap-x-2 mt-4">
           <input type="checkbox" onChange={() => setWhatsapp(!whatsapp)} />
           <label>Require whatsapp notification</label>
         </div>
-        <div className="flex justify-center items-center mb-4 gap-x-2">
+        <div className="flex justify-center items-center mb-4 gap-x-2 mt-4">
           <input
             type="checkbox"
             onChange={() => setEmailOption(!emailOption)}
           />
           <label>Require email notification</label>
         </div>
-        <div className="flex justify-center items-center mb-4 gap-x-2">
+        <div className="flex justify-center items-center mb-4 gap-x-2 mt-4">
           <input
             type="checkbox"
             checked={telegramOption}
@@ -214,11 +261,24 @@ const TodoApp = () => {
           />
           <label>Require Telegram notification &nbsp;</label>
         </div>
+
+        <Button
+          onClick={() =>
+            setQueryData({
+              view: true,
+              value: "",
+              result: queryResultInitialState.result,
+            })
+          }
+          className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700  disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          GPT
+        </Button>
       </div>
 
       <Modal
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
+        open={newModalOpen}
+        onClose={() => setNewModalOpen(false)}
         title="Add New Task"
       >
         <div>
@@ -306,10 +366,74 @@ const TodoApp = () => {
         </Button>
       </Modal>
 
+      <Modal
+        open={queryData.view}
+        onClose={() => setQueryData(queryResultInitialState)}
+        title="Search"
+      >
+        <div className="flex flex-col justify-center items-center gap-y-4 p-4">
+          <input
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) =>
+              setQueryData((prev: QueryType) => {
+                return {
+                  ...prev,
+                  value: e.target.value,
+                  result: queryResultInitialState.result,
+                };
+              })
+            }
+          />
+          {queryData.result && (
+            <>
+              <div className="font-medium text-base text-center text-blue-700">
+                {queryData.result.message}
+              </div>
+
+              <div className="text-gray-700">
+                {queryData.result.data.length > 0 &&
+                  queryData.result.data[0].title.length > 0 &&
+                  queryData.result.data.map((item, index) => {
+                    const showNA = new Date(item.dueDate).getFullYear() <= 2000;
+                    return (
+                      <div
+                        key={index}
+                        className="mb-2"
+                        dangerouslySetInnerHTML={{
+                          __html: `Task <b>${item.title}</b> is ${
+                            item.done ? "completed" : "incomplete"
+                          } ${showNA ? "" : `due on ${item.dueDate}`} ${
+                            item.dueTime ? `at ${item.dueTime}` : ""
+                          } .`,
+                        }}
+                      ></div>
+                    );
+                  })}
+              </div>
+            </>
+          )}
+          <div className="flex gap-x-4">
+            <Button
+              onClick={() => setQueryData(queryResultInitialState)}
+              variant="outline"
+            >
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                searchData(queryData.value);
+              }}
+            >
+              Sumbit
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
       <Table
         data={todos}
         columns={todoColumns(toggleDone, toggleDelete)}
-        setNewModalOpen={setIsOpen}
+        setNewModalOpen={setNewModalOpen}
       />
     </div>
   );
