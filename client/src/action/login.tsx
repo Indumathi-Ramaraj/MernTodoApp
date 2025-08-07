@@ -3,7 +3,7 @@ import axiosInstance from "../network";
 import Cookies from "js-cookie";
 
 export const login = async (email: string, password: string) => {
-  let res = await axiosInstance.post(Endpoints.LOGIN, {
+  const res = await axiosInstance.post(Endpoints.LOGIN, {
     email,
     password,
   });

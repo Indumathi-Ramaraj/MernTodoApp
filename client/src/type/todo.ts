@@ -6,3 +6,17 @@ export type Todo = {
   dueTime: string;
   done: boolean;
 }[];
+
+export type QueryType = {
+  view: boolean;
+  value: string;
+  result: {
+    data: {
+      title: string;
+      done: boolean;
+      dueTime: string;
+      dueDate: string;
+    }[];
+    message: string;
+  };
+};

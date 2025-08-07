@@ -5,12 +5,12 @@ const {
   getTodos,
   updateTodoStatus,
   deleteTodoItem,
+  queryItem,
 } = require("../controllers/todoController");
 const { requireAuth } = require("../middlewares/authMiddleware");
 const { todoValidation } = require("../utlis/validators");
 
 const router = express.Router();
-
 
 /**
  * @swagger
@@ -147,7 +147,6 @@ router.post("/todo", requireAuth, todoValidation, validate, createTodo);
  */
 router.put("/todo", requireAuth, updateTodoStatus);
 
-
 /**
  * @swagger
  * /todo:
@@ -185,5 +184,7 @@ router.put("/todo", requireAuth, updateTodoStatus);
  *         description: Todo not found
  */
 router.delete("/todo", requireAuth, deleteTodoItem);
+
+router.post("/query-task", requireAuth, queryItem);
 
 module.exports = router;
